@@ -130,18 +130,6 @@ const Send = () => {
     }
   }, [file]);
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (!file) return;
-    const sizeMB = file.size / 1024 / 1024;
-    if (sizeMB < 10) {
-      setServiceFee('0.50');
-    }
-  }, [file]);
-=======
-
->>>>>>> master
-
   // Effect: When chargeId changes and paymentStatus is 'pending', wait 30s before starting upload
 
   // Auto-close payment dialog after 10 seconds if not closed by user
