@@ -44,6 +44,7 @@ const AppContent = () => {
         <Sonner />
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
+<<<<<<< HEAD
             <Routes>
               <Route path="/" element={<Navigate to="/landing" replace />} />
               <Route path="/landing" element={<Landing />} />
@@ -59,6 +60,20 @@ const AppContent = () => {
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+=======
+            <AppRouteGuard>
+              <Routes>
+                <Route path="/" element={<Navigate to="/landing" replace />} />
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/send" element={<ProtectedRoute element={<Send />} />} />
+                <Route path="/documents" element={<ProtectedRoute element={<Documents />} />} />
+                <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
+                <Route path="/about" element={<About />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AppRouteGuard>
+>>>>>>> master
           </BrowserRouter>
         </QueryClientProvider>
       </TooltipProvider>

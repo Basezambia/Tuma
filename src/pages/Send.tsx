@@ -130,6 +130,7 @@ const Send = () => {
     }
   }, [file]);
 
+<<<<<<< HEAD
   useEffect(() => {
     if (!file) return;
     const sizeMB = file.size / 1024 / 1024;
@@ -137,6 +138,9 @@ const Send = () => {
       setServiceFee('0.50');
     }
   }, [file]);
+=======
+
+>>>>>>> master
 
   // Effect: When chargeId changes and paymentStatus is 'pending', wait 30s before starting upload
 
@@ -582,7 +586,7 @@ const Send = () => {
                     <p className="text-doc-medium-gray">Loading recent recipients...</p>
                   </div>
                 ) : recentRecipients.length > 0 ? (
-                  recentRecipients.map((recipient) => (
+                  recentRecipients.slice(0, 4).map((recipient) => (
                     <button
                       key={recipient.address}
                       onClick={() => {
@@ -635,23 +639,19 @@ const Send = () => {
               <h3 className="font-medium mb-4">Pricing Tiers</h3>
               <ul className="space-y-3 text-sm">
                 <li className="flex justify-between">
-                  <span className="text-doc-medium-gray">Tier 1 (&lt;100KB):</span>
+                  <span className="text-doc-medium-gray">Tier 1 (&lt;10MB):</span>
                   <span className="font-medium">0.05 USDC</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-doc-medium-gray">Tier 2 (100KB-20MB):</span>
+                  <span className="text-doc-medium-gray">Tier 2 (10-50MB):</span>
                   <span className="font-medium">1.00 USDC</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-doc-medium-gray">Tier 3 (20-50MB):</span>
+                  <span className="text-doc-medium-gray">Tier 3 (50-100MB):</span>
                   <span className="font-medium">2.00 USDC</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-doc-medium-gray">Tier 4 (50-100MB):</span>
-                  <span className="font-medium">3.00 USDC</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-doc-medium-gray">Tier 5 (&gt;100MB):</span>
+                  <span className="text-doc-medium-gray">Tier 4 (&gt;100MB):</span>
                   <span className="font-medium">5.00 USDC</span>
                 </li>
               </ul>
