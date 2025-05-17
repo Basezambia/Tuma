@@ -32,33 +32,48 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Request body is required' });
     }
 
-    // Validate required parameters
-    if (!req.body.pricing_type) {
+    // Ensure required fields are present
+    const { amount, currency, name, description, fileSize } = req.body;
+    if (!amount || !currency || !name) {
       return res.status(400).json({ 
-        error: 'pricing_type is required',
-        details: 'pricing_type must be either "fixed_price" or "no_price"'
+        error: 'Missing required fields',
+        required: ['amount', 'currency', 'name']
       });
     }
 
-    // Ensure pricing_type is one of the allowed values
-    if (!['fixed_price', 'no_price'].includes(req.body.pricing_type)) {
-      return res.status(400).json({
-        error: 'Invalid pricing_type',
-        details: 'pricing_type must be either "fixed_price" or "no_price"'
-      });
+    // Determine pricing tier based on file size
+    let tier = 'Tier 1 (<100KB)';
+    const sizeMB = parseFloat(fileSize) / 1024 / 1024; // Convert bytes to MB
+    
+    if (sizeMB < 0.1) {
+      tier = 'Tier 1 (<100KB)';
+    } else if (sizeMB < 20) {
+      tier = 'Tier 2 (100KB-20MB)';
+    } else if (sizeMB < 50) {
+      tier = 'Tier 3 (20-50MB)';
+    } else if (sizeMB < 100) {
+      tier = 'Tier 4 (50-100MB)';
+    } else {
+      tier = 'Tier 5 (>100MB)';
     }
 
     // Prepare the charge data with required fields
     const chargeData = {
-      ...req.body,
-      pricing_type: req.body.pricing_type,
-      // Ensure local_price is included for fixed_price
-      ...(req.body.pricing_type === 'fixed_price' && !req.body.local_price && {
-        local_price: {
-          amount: req.body.amount || '0.00',
-          currency: req.body.currency || 'USD'
-        }
-      })
+      name: `Document Upload - ${tier}`,
+      description: description || `Payment for document upload (${tier})`,
+      pricing_type: 'fixed_price',
+      local_price: {
+        amount: amount.toString(),
+        currency: currency.toLowerCase()
+      },
+      metadata: {
+        ...(req.body.metadata || {}),
+        file_size: fileSize,
+        tier: tier,
+        timestamp: new Date().toISOString()
+      },
+      redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL}/upload?status=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/upload?status=canceled`
     };
 
     const response = await fetch(COINBASE_COMMERCE_API_URL, {

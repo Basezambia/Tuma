@@ -197,16 +197,28 @@ const Send = () => {
     try {
       setPaymentStatus('processing');
       setPaymentError(null);
-      // Call backend to create charge with correct amount
+      if (!file) {
+        throw new Error('No file selected');
+      }
+
+      // Call backend to create charge with correct amount and file size
       const response = await fetch('/api/createCharge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          name: 'Document Upload Payment',
+          description: `Payment for document upload (${fileSizeTier})`,
           amount: serviceFee,
-          currency: paymentCurrency,
-          name: 'Document Payment',
-          description: `Payment for document (tier: ${fileSizeTier})`,
-          metadata: { sender: senderAddress, recipient: recipientAddress, documentId }
+          currency: paymentCurrency.toLowerCase(),
+          fileSize: file.size, // Include the actual file size in bytes
+          metadata: { 
+            sender: senderAddress, 
+            recipient: recipientAddress, 
+            documentId,
+            file_name: file.name,
+            file_type: file.type,
+            timestamp: new Date().toISOString()
+          }
         })
       });
       const data = await response.json();
