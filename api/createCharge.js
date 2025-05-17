@@ -32,6 +32,35 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Request body is required' });
     }
 
+    // Validate required parameters
+    if (!req.body.pricing_type) {
+      return res.status(400).json({ 
+        error: 'pricing_type is required',
+        details: 'pricing_type must be either "fixed_price" or "no_price"'
+      });
+    }
+
+    // Ensure pricing_type is one of the allowed values
+    if (!['fixed_price', 'no_price'].includes(req.body.pricing_type)) {
+      return res.status(400).json({
+        error: 'Invalid pricing_type',
+        details: 'pricing_type must be either "fixed_price" or "no_price"'
+      });
+    }
+
+    // Prepare the charge data with required fields
+    const chargeData = {
+      ...req.body,
+      pricing_type: req.body.pricing_type,
+      // Ensure local_price is included for fixed_price
+      ...(req.body.pricing_type === 'fixed_price' && !req.body.local_price && {
+        local_price: {
+          amount: req.body.amount || '0.00',
+          currency: req.body.currency || 'USD'
+        }
+      })
+    };
+
     const response = await fetch(COINBASE_COMMERCE_API_URL, {
       method: 'POST',
       headers: {
@@ -39,7 +68,7 @@ export default async function handler(req, res) {
         'X-CC-Api-Key': COINBASE_COMMERCE_API_KEY,
         'X-CC-Version': '2018-03-22',
       },
-      body: JSON.stringify(req.body),
+      body: JSON.stringify(chargeData),
     });
 
     const data = await response.json();
